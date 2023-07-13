@@ -36,13 +36,13 @@ def parse_mrr_signal(serial, plugin):
     exit = False
     out_file = None
     while exit == False:
+        cur_time = datetime.now(timezone.utc)
         try:
             line = serial.readline()
         except:
             time.sleep(2)
             continue
         if line.startswith(b'\x01'):
-            cur_time = datetime.now(timezone.utc)
             time_str = datetime.strftime(cur_time, "%y%m%d%H%M%S")
             if out_file is None:
                 out_file_name = '%s.raw' % time_str
