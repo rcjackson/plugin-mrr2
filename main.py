@@ -38,7 +38,8 @@ def parse_mrr_signal(serial, plugin):
     while exit == False:
         try:
             line = serial.readline()
-        except pyserial.SerialException:
+        except:
+            time.sleep(2)
             continue
         if line.startswith(b'\x01'):
             cur_time = datetime.now(timezone.utc)
@@ -80,7 +81,7 @@ def process_hour():
     previous_hour = cur_time - timedelta(hours=1)
     df = sage_data_client.query(
             start="-1h",
-            filter={"vsn": "W057", "name": "upload", "task": "mrr2",
+            filter={"vsn": "W057", "name": "upload", "task": "atmos-mrr2-raw",
                     }).set_index("timestamp")
     if not os.path.exists('/app/raw_files/'):
         os.makedirs('/app/raw_files/')
@@ -106,19 +107,9 @@ def main(args):
             args.device, 57600, parity=serial.PARITY_NONE,
             xonxoff=True, timeout=args.timeout) as ser:
         print("Serial connection to %s open" % args.device)
-        thread = None
         with Plugin() as plugin:
-            published_this_hour = False
             while True:    
                 parse_mrr_signal(ser, plugin)
-                cur_time = datetime.now()
-                if cur_time.minute == 0:
-                    if published_this_hour == False:
-                        published_this_hour = True
-                        thread = threading.Thread(target=process_hour, args=(plugin,))
-                        thread.start()
-                else:
-                     published_this_hour = False
                 
 
 
