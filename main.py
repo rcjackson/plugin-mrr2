@@ -124,7 +124,7 @@ if __name__ == "__main__":
     parser.add_argument("--timeout",
             type=float,
             dest='timeout',
-            default=1,
+            default=None,
             help="Number of seconds before signal timeout.")
     parser.add_argument("--process",
             action='store_true',
